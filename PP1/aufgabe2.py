@@ -1,4 +1,4 @@
-"""Aufgabe 2 - DFT vs. FFT: Laufzeitexperiment      Bearbeiter: __________
+"""Aufgabe 2 - DFT vs. FFT: Laufzeitexperiment
 
 - naive DFT (O(N^2)) selbst schreiben, FFT aus numpy
 - N = 2^4 ... 2^12, Laufzeit messen (time.perf_counter)

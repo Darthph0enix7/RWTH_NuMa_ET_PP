@@ -1,4 +1,4 @@
-"""Aufgabe 3 - Kondition der Entzerrungsmatrix       Bearbeiter: __________
+"""Aufgabe 3 - Kondition der Entzerrungsmatrixt
 
 kappa_2(C) = max_k |h_hat_k| / min_k |h_hat_k|
 

@@ -1,4 +1,4 @@
-"""Aufgabe 1 - Kanalschaetzung und Entzerrung        Bearbeiter: __________
+"""Aufgabe 1 - Kanalschaetzung und Entzerrung
 
 a) datensatz1.csv: Praefix weg, FFT, Pilotwerte bei k = 0, 4, 8, 12 pruefen
 b) datensatz2.csv: Echovektor h (Laenge 4) ueber die Piloten bestimmen
