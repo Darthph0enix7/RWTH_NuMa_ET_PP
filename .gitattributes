@@ -1,0 +1,9 @@
+# Zeilenenden vereinheitlichen (Windows + macOS mischen sich sonst -> Fake-Diffs)
+* text=auto eol=lf
+
+# Binärdateien nicht anfassen
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.zip binary
