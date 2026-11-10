@@ -81,9 +81,9 @@ def lade_daten():
     return E_pruef, T_exakt, stuetzwerte
 
 
-# =============================================================================
+
 # Hauptprogramm mit Durchführung von 1a und 1b
-# =============================================================================
+
 
 def main():
     # 1. Daten einlesen
