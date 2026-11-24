@@ -120,6 +120,7 @@ def main():
         err_v = np.max(np.abs(p_vander - T_exakt))
         emax_vander.append(err_v)
 
+
         # --- Aufgabe 1b: Baryzentrische Interpolation ---
         w = baryzentrische_gewichte(x_nodes)
         p_bary = baryzentrische_auswertung(x_nodes, y_nodes, w, E_pruef)
