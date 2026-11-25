@@ -25,7 +25,7 @@ def fehler(x, w):
 
 def main():
     print("Fehler und Schranke in µJ; Ziel: Fehler < 1 µJ.")
-    fig, achsen = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
+    fig, achsen = plt.subplots(1, 2, figsize=(10, 4.5), sharey=True, layout="constrained")
     verfahren = (
         ("Gauß-Legendre", gauss_formel, False), ("Newton-Cotes", nc_formel, True)
     )
@@ -42,12 +42,12 @@ def main():
         einzeln = [r for r in ergebnisse if r[2] == 1]
         plot_werte = [r for r in einzeln if r[0] <= 10]
         kosten = [r[0] for r in plot_werte]
-        ax.semilogy(kosten, [r[5] for r in plot_werte], "o-", label="Beobachteter Fehler")
-        ax.semilogy(kosten, [r[6] for r in plot_werte], "s--", label="Fehlerschranke")
-        ax.axhline(1, color="tab:red", linestyle=":", label="Ziel: unter 1 µJ")
+        ax.semilogy(kosten, [r[5] for r in plot_werte], "o-", color="tab:blue", label="Beobachteter Fehler")
+        ax.semilogy(kosten, [r[6] for r in plot_werte], "s--", color="tab:orange", label="Fehlerschranke")
+        ax.axhline(1, color="tab:red", linestyle=":", label="Grenze: 1 µJ")
         ax.set(title=name, xlabel="Anzahl Messungen", xticks=range(1, 11))
         ax.grid(True, alpha=0.3)
-        ax.legend()
+        ax.legend(loc="upper right")
 
         for titel, kandidaten in (
             ("Ein Intervall", einzeln),
@@ -61,13 +61,17 @@ def main():
                 kosten, n, m, quad, daten, gesamt, schranke = min(
                     passend, key=lambda r: (r[0], r[spalte])
                 )
+                if m == 1 and kriterium == "garantiert" and kosten <= 10:
+                    ax.scatter(kosten, schranke, s=100, facecolors="none", edgecolors="tab:orange", zorder=4)
+                    ax.annotate(f"{kosten} Messungen reichen", (kosten, schranke),
+                                xytext=(13, 25), textcoords="offset points", fontsize="small",
+                                arrowprops={"arrowstyle": "->", "color": "0.4"})
                 print(f"  {titel}, {kriterium}: {kosten} Messungen (N={n}, M={m})")
                 print(f"    Quadratur={quad:+.4f}, Daten={daten:+.4f}, "
                       f"Gesamtbetrag={gesamt:.4f}, Schranke={schranke:.4f}")
 
     achsen[0].set_ylabel("Fehler [µJ] (logarithmisch)")
     fig.suptitle("Kondensatorenergie: Quadratur auf einem Intervall")
-    fig.tight_layout()
     fig_dir = Path(__file__).resolve().parent / "figures"
     fig_dir.mkdir(exist_ok=True)
     fig.savefig(fig_dir / "aufgabe4_kondensator.png", dpi=150)
