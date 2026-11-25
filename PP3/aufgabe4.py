@@ -1,5 +1,8 @@
 """Aufgabe 4: Kondensatorenergie mit möglichst wenigen Messungen."""
 
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 from aufgabe1 import gauss_formel, quadratur, summierte_formel
@@ -22,9 +25,11 @@ def fehler(x, w):
 
 def main():
     print("Fehler und Schranke in µJ; Ziel: Fehler < 1 µJ.")
-    for name, formel, randpunkte in (
+    fig, achsen = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
+    verfahren = (
         ("Gauß-Legendre", gauss_formel, False), ("Newton-Cotes", nc_formel, True)
-    ):
+    )
+    for ax, (name, formel, randpunkte) in zip(achsen, verfahren):
         ergebnisse = []
         for n in range(2 if randpunkte else 1, 41):
             x_hat, w_hat = formel(n)
@@ -34,8 +39,18 @@ def main():
                 ergebnisse.append((len(x), n, m, *fehler(x, w)))
 
         print(f"\n{name}:")
+        einzeln = [r for r in ergebnisse if r[2] == 1]
+        plot_werte = [r for r in einzeln if r[0] <= 10]
+        kosten = [r[0] for r in plot_werte]
+        ax.semilogy(kosten, [r[5] for r in plot_werte], "o-", label="Beobachteter Fehler")
+        ax.semilogy(kosten, [r[6] for r in plot_werte], "s--", label="Fehlerschranke")
+        ax.axhline(1, color="tab:red", linestyle=":", label="Ziel: unter 1 µJ")
+        ax.set(title=name, xlabel="Anzahl Messungen", xticks=range(1, 11))
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+
         for titel, kandidaten in (
-            ("Ein Intervall", [r for r in ergebnisse if r[2] == 1]),
+            ("Ein Intervall", einzeln),
             ("Mehrere Intervalle", [r for r in ergebnisse if r[2] > 1]),
         ):
             for kriterium, spalte in (("im Versuch", 5), ("garantiert", 6)):
@@ -49,6 +64,14 @@ def main():
                 print(f"  {titel}, {kriterium}: {kosten} Messungen (N={n}, M={m})")
                 print(f"    Quadratur={quad:+.4f}, Daten={daten:+.4f}, "
                       f"Gesamtbetrag={gesamt:.4f}, Schranke={schranke:.4f}")
+
+    achsen[0].set_ylabel("Fehler [µJ] (logarithmisch)")
+    fig.suptitle("Kondensatorenergie: Quadratur auf einem Intervall")
+    fig.tight_layout()
+    fig_dir = Path(__file__).resolve().parent / "figures"
+    fig_dir.mkdir(exist_ok=True)
+    fig.savefig(fig_dir / "aufgabe4_kondensator.png", dpi=150)
+    plt.show()
 
 
 if __name__ == "__main__":
