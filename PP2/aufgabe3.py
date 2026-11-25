@@ -34,19 +34,6 @@ def berechne_lebesgue_konstante(x_nodes, w, x_eval):
     lambda_x = np.sum(np.abs(l_basis), axis=1)
     return np.max(lambda_x)
 
-def vandermonde_matrix(x):
-    n = len(x) - 1
-    V = np.zeros((len(x), n + 1))
-    for j in range(n + 1):
-        V[:, j] = x**j
-    return V
-
-def horner_schema(a, x_eval):
-    p = np.zeros_like(x_eval, dtype=float)
-    for i in range(len(a) - 1, -1, -1):
-        p = p * x_eval + a[i]
-    return p
-
 
 # ==============================================================================
 # HAUPTPROGRAMM
@@ -64,7 +51,6 @@ def main():
     E_pruef = pruefraster["E_mV"].values
     T_exakt_pruef = pruefraster["T_exakt_C"].values
 
-    # KORRIGIERTE SPALTENREIHENFOLGE: Erst T_exakt_C, dann T_kalibrator_C!
     spalten_stuetz = ["n", "i", "E_mV", "T_exakt_C", "T_kalibrator_C"]
     df_aequi = pd.read_csv(os.path.join(daten_ordner, "stuetzwerte_aequidistant.csv"), comment="#", sep=r'\s+', names=spalten_stuetz)
     df_tscheby = pd.read_csv(os.path.join(daten_ordner, "stuetzwerte_tschebyscheff.csv"), comment="#", sep=r'\s+', names=spalten_stuetz)
@@ -86,15 +72,20 @@ def main():
         
         w_aequi = baryzentrische_gewichte(x_aequi)
         p_exakt_aequi = baryzentrische_interpolation(x_aequi, y_exakt_aequi, w_aequi, E_pruef)
+
+        # Berechnung des Interpolationsfehlers für Äquidistante Stützstellen
         e_interp_aequi.append(np.max(np.abs(p_exakt_aequi - T_exakt_pruef)))
+
 
         # 2. Tschebyscheff-Stützstellen
         daten_tscheby = df_tscheby[df_tscheby["n"] == n]
         x_tscheby = daten_tscheby["E_mV"].values
         y_exakt_tscheby = daten_tscheby["T_exakt_C"].values 
-        
+
         w_tscheby = baryzentrische_gewichte(x_tscheby)
         p_exakt_tscheby = baryzentrische_interpolation(x_tscheby, y_exakt_tscheby, w_tscheby, E_pruef)
+
+        # Berechnung des Interpolationsfehlers für Tschebyscheff-Stützstellen
         e_interp_tscheby.append(np.max(np.abs(p_exakt_tscheby - T_exakt_pruef)))
 
     plt.figure(1, figsize=(9, 5))
@@ -126,6 +117,7 @@ def main():
         p_kali_aequi = baryzentrische_interpolation(x_aequi, y_kali_aequi, w_aequi, E_pruef)
         
         e_daten_aequi.append(np.max(np.abs(p_kali_aequi - p_exakt_aequi)))
+        # Berechnung der Schranke für den Datenfehler unter Verwendung der Lebesgue-Konstante
         schranke_aequi.append(berechne_lebesgue_konstante(x_aequi, w_aequi, E_pruef) * 0.005)
 
         # 2. Tschebyscheff-Stützstellen
@@ -139,6 +131,7 @@ def main():
         p_kali_tscheby = baryzentrische_interpolation(x_tscheby, y_kali_tscheby, w_tscheby, E_pruef)
         
         e_daten_tscheby.append(np.max(np.abs(p_kali_tscheby - p_exakt_tscheby)))
+        # Berechnung der Schranke für den Datenfehler unter Verwendung der Lebesgue-Konstante
         schranke_tscheby.append(berechne_lebesgue_konstante(x_tscheby, w_tscheby, E_pruef) * 0.005)
 
     fig2, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
